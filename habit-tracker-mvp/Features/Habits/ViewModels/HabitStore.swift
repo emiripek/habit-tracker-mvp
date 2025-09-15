@@ -47,6 +47,14 @@ final class HabitStore: ObservableObject {
         try context.save()
     }
 
+    /// Updates a habit's name after validation and persists it.
+    func updateHabit(_ habit: Habit, name: String) throws {
+        let trimmed = name.trimmingCharacters(in: .whitespacesAndNewlines)
+        guard !trimmed.isEmpty else { throw ValidationError.emptyName }
+        habit.name = trimmed
+        try context.save()
+    }
+
     /// Marks today as completed if not already; returns true if added.
     func toggleToday(_ habit: Habit, calendar: Calendar = .current) throws -> Bool {
         let key = DayKey.from(Date(), calendar: calendar)
