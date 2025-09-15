@@ -13,11 +13,11 @@
   - Model: `@Model Habit` with `id`, `name`, `createdAt`, `completionDayKeys`.
   - ViewModel: `HabitStore` owns business logic and persistence commands (add, update, delete, toggle, streak).
   - Views: `HabitListView`, `AddHabitView`, `EditHabitView` (+ small subviews `HabitRow`, `MiniStreakView`).
-- App setup: Container is set in `HabitTrackerApp` via `.modelContainer(for: Habit.self)`. Legacy `yyyyMMdd` keys are normalized to 24h buckets at read-time only (no persistent migration in MVP).
+- App setup: Container is set in `HabitTrackerApp` via `.modelContainer(for: Habit.self)`, root view is `HabitListView`. Legacy `yyyyMMdd` keys are normalized to 24h buckets at read-time only (no persistent migration in MVP).
 - Day definition and streak logic:
   - A “day” is an exact 24-hour bucket (UTC-based) defined in `DayBucket`. One completion is allowed per bucket.
   - Streaks are computed by walking consecutive 24h buckets backward from “today”. Missing any bucket resets the streak naturally.
-  - Legacy support: `DayKey` (yyyyMMdd) remains as a helper to convert old data during the migration.
+  - Legacy support: `DayKey` (yyyyMMdd) remains solely as a helper to convert old data at read-time via `toDate(...)`.
 
 ## 3) Use of AI Tools
 - Which tools: ChatGPT (Codex CLI) was used during development.

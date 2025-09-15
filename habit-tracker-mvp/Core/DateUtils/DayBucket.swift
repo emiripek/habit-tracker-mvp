@@ -23,9 +23,4 @@ enum DayBucket {
     /// Previous bucket index.
     static func previous(_ bucket: Int) -> Int { bucket - 1 }
 
-    /// Start time of the given bucket in UTC.
-    static func startDate(_ bucket: Int) -> Date {
-        Date(timeIntervalSince1970: TimeInterval(bucket) * secondsPerDay)
-    }
 }
-
