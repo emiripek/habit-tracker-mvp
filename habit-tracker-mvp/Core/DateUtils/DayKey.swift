@@ -1,3 +1,10 @@
+//
+//  DayKey.swift
+//  habit-tracker-mvp
+//
+//  Created by Emirhan Ipek on 15.09.2025.
+//
+
 import Foundation
 
 /// Helpers for converting between dates and compact yyyyMMdd integer keys.

@@ -123,7 +123,7 @@ private struct MiniStreakView: View {
         let keys = lastNDaysKeys(days)
         HStack(spacing: 6) {
             ForEach(keys, id: \.self) { key in
-                let done = habit.completionDayKeys.contains(key)
+                let done = normalizeToBucketSet(habit.completionDayKeys).contains(key)
                 RoundedRectangle(cornerRadius: 3, style: .continuous)
                     .fill(done ? Color.accentColor : Color.secondary.opacity(0.2))
                     .frame(width: 10, height: 10)
@@ -137,12 +137,9 @@ private struct MiniStreakView: View {
         .frame(maxWidth: .infinity, alignment: .leading)
     }
 
-    private func lastNDaysKeys(_ n: Int, calendar: Calendar = .current) -> [Int] {
+    private func lastNDaysKeys(_ n: Int) -> [Int] {
         guard n > 0 else { return [] }
-        let today = Date()
-        return (0..<(n)).reversed().map { offset in
-            let date = calendar.date(byAdding: .day, value: -offset, to: today) ?? today
-            return DayKey.from(date, calendar: calendar)
-        }
+        let todayBucket = DayBucket.today
+        return (0..<(n)).reversed().map { offset in todayBucket - offset }
     }
 }

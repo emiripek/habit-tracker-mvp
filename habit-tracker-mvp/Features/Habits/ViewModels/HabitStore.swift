@@ -55,33 +55,55 @@ final class HabitStore: ObservableObject {
         try context.save()
     }
 
-    /// Marks today as completed if not already; returns true if added.
-    func toggleToday(_ habit: Habit, calendar: Calendar = .current) throws -> Bool {
-        let key = DayKey.from(Date(), calendar: calendar)
-        if habit.completionDayKeys.contains(key) {
+    /// Marks the current 24h day-bucket as completed if not already; returns true if added.
+    /// Uses 24-hour buckets (UTC-based) to ensure exact 24h windows.
+    func toggleToday(_ habit: Habit) throws -> Bool {
+        let bucket = DayBucket.today
+        if habit.completionDayKeys.contains(bucket) {
             return false
         }
-        habit.completionDayKeys.insert(key)
+        habit.completionDayKeys.insert(bucket)
         try context.save()
         return true
     }
 
     // MARK: - Queries
 
-    /// Computes the current streak counting back from today.
-    func streak(for habit: Habit, today: Date = Date(), calendar: Calendar = .current) -> Int {
-        let todayKey = DayKey.from(today, calendar: calendar)
-        return computeStreak(keys: habit.completionDayKeys, todayKey: todayKey, calendar: calendar)
+    /// Computes the current streak counting back from the current 24h bucket.
+    func streak(for habit: Habit, now: Date = Date()) -> Int {
+        let todayBucket = DayBucket.from(now)
+        return computeStreak(keys: habit.completionDayKeys, todayBucket: todayBucket)
     }
 }
 
-// MARK: - Pure helper (no SwiftData)
-internal func computeStreak(keys: Set<Int>, todayKey: Int, calendar: Calendar = .current) -> Int {
+// MARK: - Pure helpers (no SwiftData)
+
+/// Normalizes a set of stored keys into 24h buckets.
+/// For forward-compatibility: if a key looks like a calendar yyyyMMdd (>= 1_000_000), it is converted to a bucket.
+/// Otherwise it is assumed to already be a bucket index.
+internal func normalizeToBucketSet(_ keys: Set<Int>) -> Set<Int> {
+    var out = Set<Int>()
+    out.reserveCapacity(keys.count)
+    for k in keys {
+        if k >= 1_000_000 { // likely yyyyMMdd
+            if let d = DayKey.toDate(k) {
+                out.insert(DayBucket.from(d))
+            }
+        } else {
+            out.insert(k)
+        }
+    }
+    return out
+}
+
+/// Computes streak using normalized 24h buckets.
+internal func computeStreak(keys: Set<Int>, todayBucket: Int) -> Int {
+    let normalized = normalizeToBucketSet(keys)
     var count = 0
-    var cursor = todayKey
-    while keys.contains(cursor) {
+    var cursor = todayBucket
+    while normalized.contains(cursor) {
         count += 1
-        cursor = DayKey.previous(cursor, calendar: calendar)
+        cursor = DayBucket.previous(cursor)
     }
     return count
 }
