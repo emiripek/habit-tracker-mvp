@@ -12,10 +12,10 @@ struct AddHabitView: View {
     @Environment(\.dismiss) private var dismiss
     @Environment(\.modelContext) private var context
     @State private var name: String = ""
-
+    
     var body: some View {
         let trimmedName = name.trimmingCharacters(in: .whitespacesAndNewlines)
-
+        
         NavigationStack {
             Form {
                 Section {

@@ -13,7 +13,7 @@ struct HabitListView: View {
     @Query(sort: \Habit.createdAt, order: .forward) private var habits: [Habit]
     @State private var isPresentingAdd = false
     @State private var habitToEdit: Habit? = nil
-
+    
     var body: some View {
         NavigationStack {
             Group {
@@ -92,7 +92,7 @@ struct HabitListView: View {
 private struct HabitRow: View {
     @Environment(\.modelContext) private var context
     let habit: Habit
-
+    
     var body: some View {
         VStack(alignment: .leading, spacing: 6) {
             HStack(alignment: .firstTextBaseline) {
@@ -123,7 +123,7 @@ private struct MiniStreakView: View {
         let keys = lastNDaysKeys(days)
         HStack(spacing: 6) {
             ForEach(keys, id: \.self) { key in
-                let done = normalizeToBucketSet(habit.completionDayKeys).contains(key)
+                let done = habit.completionDayKeys.contains(key)
                 RoundedRectangle(cornerRadius: 3, style: .continuous)
                     .fill(done ? Color.accentColor : Color.secondary.opacity(0.2))
                     .frame(width: 10, height: 10)
@@ -136,7 +136,7 @@ private struct MiniStreakView: View {
         }
         .frame(maxWidth: .infinity, alignment: .leading)
     }
-
+    
     private func lastNDaysKeys(_ n: Int) -> [Int] {
         guard n > 0 else { return [] }
         let todayBucket = DayBucket.today

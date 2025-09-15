@@ -11,18 +11,18 @@ import SwiftData
 struct EditHabitView: View {
     @Environment(\.dismiss) private var dismiss
     @Environment(\.modelContext) private var context
-
+    
     let habit: Habit
     @State private var name: String
-
+    
     init(habit: Habit) {
         self.habit = habit
         _name = State(initialValue: habit.name)
     }
-
+    
     var body: some View {
         let trimmedName = name.trimmingCharacters(in: .whitespacesAndNewlines)
-
+        
         NavigationStack {
             Form {
                 Section("Name") {
